@@ -1,0 +1,38 @@
+{{- range .Values.apps }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ex02.fullname" $ }}-{{ .name }}
+  labels:
+    {{- include "ex02.labels" $ | nindent 4 }}
+    app: {{ .name }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ex02.selectorLabels" $ | nindent 6 }}
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        {{- include "ex02.labels" $ | nindent 8 }}
+        app: {{ .name }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .name }}
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          {{- with .args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .service.port }}
+              protocol: TCP
+{{- end }}

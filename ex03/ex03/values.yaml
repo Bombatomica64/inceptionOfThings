@@ -1,0 +1,12 @@
+# Main chart namespace
+namespace: default
+
+# ArgoCD subchart configuration
+argocd:
+  namespace: argocd
+  # ArgoCD subchart values will be defined in charts/argocd/values.yaml
+
+# Dev subchart configuration
+dev:
+  namespace: dev
+  # Dev subchart values will be defined in charts/dev/values.yaml

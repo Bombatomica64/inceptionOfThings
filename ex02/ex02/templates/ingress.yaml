@@ -1,0 +1,40 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "ex02.fullname" . }}
+  labels:
+    {{- include "ex02.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  rules:
+    {{- range $index, $host := .Values.ingress.hosts }}
+    - host: {{ $host.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "ex02.fullname" $ }}-{{ $host.appName }}
+                port:
+                  number: {{ (index $.Values.apps $index).service.port }}
+    {{- end }}
+    {{- if .Values.ingress.defaultBackend }}
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "ex02.fullname" . }}-{{ .Values.ingress.defaultBackend.appName }}
+                port:
+                  number: {{ (index .Values.apps 2).service.port }}
+    {{- end }}
+{{- end }}

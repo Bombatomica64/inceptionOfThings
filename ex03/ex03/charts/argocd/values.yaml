@@ -1,0 +1,41 @@
+# ArgoCD configuration - these values are passed to the argo-cd subchart
+argo-cd:
+  # Install in argocd namespace
+  global:
+    domain: argocd.local
+
+  # Simplified setup - disable components not needed for basic GitOps
+  dex:
+    enabled: false
+
+  notifications:
+    enabled: false
+
+  applicationSet:
+    enabled: false
+
+  # Server configuration
+  server:
+    service:
+      type: NodePort
+      nodePortHttp: 30080
+
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      hosts:
+        - argocd.local
+
+  # Repo server for Git monitoring
+  repoServer:
+    autoscaling:
+      enabled: false
+
+  # Controller watches for Git changes
+  controller:
+    replicas: 1
+
+  # Configs for initial setup
+  configs:
+    params:
+      server.insecure: true # Disable TLS
